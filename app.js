@@ -6,6 +6,24 @@ const marcas = document.querySelector('#marcas')
 const resumo = document.querySelector('#resumo')
 const lista = document.querySelector('#lista')
 
+const CHAVE = 'vaga-clara'
+const armazenamento = {
+  ler: () => {
+    try {
+      return localStorage.getItem(CHAVE)
+    } catch {
+      return null
+    }
+  },
+  gravar: (texto) => {
+    try {
+      localStorage.setItem(CHAVE, texto)
+    } catch {
+      // Sem espaço ou permissão: a revisão segue sem guardar o texto.
+    }
+  },
+}
+
 const elemento = (tag, propriedades = {}) => Object.assign(document.createElement(tag), propriedades)
 
 const criarMarca = ({ texto, achado }) =>
@@ -50,6 +68,7 @@ const atualizar = () => {
   const novoResumo = resumir(normalizado, achados)
   // Só troca quando muda, para o leitor de tela não repetir o aviso a cada tecla.
   if (resumo.textContent !== novoResumo) resumo.textContent = novoResumo
+  armazenamento.gravar(normalizado)
   sincronizarRolagem()
 }
 
@@ -77,5 +96,9 @@ document.querySelector('#limpar').addEventListener('click', () => {
   atualizar()
   campo.focus()
 })
+
+// Se havia uma revisão em andamento, volta com ela; senão, mantém o exemplo.
+const salvo = armazenamento.ler()
+if (salvo !== null) campo.value = salvo
 
 atualizar()

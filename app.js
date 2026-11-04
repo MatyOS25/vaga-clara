@@ -1,5 +1,5 @@
 import { analisar, segmentar } from './analisar.js'
-import { montarRelatorio, resumir, CATEGORIAS, NIVEIS } from './relatorio.js'
+import { montarRelatorio, montarDenuncia, resumir, CATEGORIAS, NIVEIS } from './relatorio.js'
 
 const campo = document.querySelector('#anuncio')
 const marcas = document.querySelector('#marcas')
@@ -75,20 +75,44 @@ const atualizar = () => {
 campo.addEventListener('input', atualizar)
 campo.addEventListener('scroll', sincronizarRolagem)
 
-const copiar = document.querySelector('#copiar')
-let avisoCopia
-
-copiar.addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText(montarRelatorio(analisar(campo.value)))
-    copiar.textContent = 'Relatório copiado!'
-  } catch {
-    copiar.textContent = 'Não foi possível copiar'
+// Devolve um avisador que troca o texto do botão por um instante.
+const criarAviso = (botao, rotulo) => {
+  let espera
+  return (texto) => {
+    botao.textContent = texto
+    clearTimeout(espera)
+    espera = setTimeout(() => {
+      botao.textContent = rotulo
+    }, 2000)
   }
-  clearTimeout(avisoCopia)
-  avisoCopia = setTimeout(() => {
-    copiar.textContent = 'Copiar relatório'
-  }, 2000)
+}
+
+const avisoCopiar = criarAviso(document.querySelector('#copiar'), 'Copiar relatório')
+const avisoDenuncia = criarAviso(document.querySelector('#copiar-denuncia'), 'Copiar texto da denúncia')
+
+const copiarTexto = async (texto, avisar, sucesso) => {
+  try {
+    await navigator.clipboard.writeText(texto)
+    avisar(sucesso)
+  } catch {
+    avisar('Não foi possível copiar')
+  }
+}
+
+document.querySelector('#copiar').addEventListener('click', () =>
+  copiarTexto(montarRelatorio(analisar(campo.value)), avisoCopiar, 'Relatório copiado!'),
+)
+
+document.querySelector('#copiar-denuncia').addEventListener('click', () => {
+  const denuncia = montarDenuncia(analisar(campo.value))
+  if (!denuncia) return avisoDenuncia('Nada a denunciar')
+  return copiarTexto(denuncia, avisoDenuncia, 'Denúncia copiada!')
+})
+
+document.querySelector('#procurar').addEventListener('click', () => {
+  const inicio = campo.value.trim().split(/\s+/).slice(0, 12).join(' ')
+  if (!inicio) return
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(`"${inicio}"`)}`, '_blank', 'noopener')
 })
 
 document.querySelector('#limpar').addEventListener('click', () => {

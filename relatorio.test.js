@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { analisar } from './analisar.js'
-import { montarRelatorio, resumir } from './relatorio.js'
+import { montarRelatorio, montarDenuncia, resumir } from './relatorio.js'
 
 test('relatório sem achados traz o aviso de leitura final', () => {
   assert.match(montarRelatorio([]), /Nenhum termo das regras foi encontrado/)
@@ -40,4 +40,22 @@ test('resumo conta os achados por nível de risco', () => {
 
 test('resumo no singular', () => {
   assert.match(resumir('x', analisar('Exigimos boa aparência.')), /1 trecho para revisar: 1 vale revisar/)
+})
+
+test('sem achados não há denúncia a fazer', () => {
+  assert.equal(montarDenuncia([]), null)
+})
+
+test('denúncia traz trechos, categorias, bases legais e campos para preencher', () => {
+  const denuncia = montarDenuncia(analisar('Sexo feminino, até 30 anos.'))
+  assert.match(denuncia, /1\. "Sexo feminino" — Restringe a vaga por sexo\. \(Sexo\)/)
+  assert.match(denuncia, /2\. "até 30 anos" — Limita a vaga por idade\. \(Idade\)/)
+  assert.match(denuncia, /373-A/)
+  assert.match(denuncia, /Empresa: \[preencher\]/)
+  assert.match(denuncia, /Site ou local onde foi publicada: \[preencher\]/)
+})
+
+test('denúncia omite a linha de base quando a regra não cita lei', () => {
+  const denuncia = montarDenuncia(analisar('Exigimos boa aparência.'))
+  assert.doesNotMatch(denuncia, /CLT|Lei /)
 })

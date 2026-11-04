@@ -43,3 +43,24 @@ export function montarRelatorio(achados) {
   })
   return [CABECALHO, total, '', ...itens].join('\n')
 }
+
+// Texto pronto para os canais oficiais (MPT, Disque 100). Sem achados, não há o que denunciar.
+export function montarDenuncia(achados) {
+  if (achados.length === 0) return null
+  const itens = achados.map((achado, indice) => {
+    const linha = `${indice + 1}. "${achado.trecho}" — ${achado.motivo} (${CATEGORIAS[achado.categoria]})`
+    return achado.base ? `${linha}\n   ${achado.base}` : linha
+  })
+  return [
+    'Denúncia de anúncio de emprego com possível discriminação',
+    '',
+    'O anúncio descrito ao final parece descumprir a legislação nos seguintes trechos:',
+    '',
+    ...itens,
+    '',
+    'Peço a apuração. Informações sobre a publicação:',
+    'Empresa: [preencher]',
+    'Site ou local onde foi publicada: [preencher]',
+    'Data em que foi vista: [preencher]',
+  ].join('\n')
+}

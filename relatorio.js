@@ -45,19 +45,23 @@ export function montarRelatorio(achados) {
 }
 
 // Texto pronto para os canais oficiais (MPT, Disque 100). Sem achados, não há o que denunciar.
-export function montarDenuncia(achados) {
+export function montarDenuncia(achados, texto = '') {
   if (achados.length === 0) return null
   const itens = achados.map((achado, indice) => {
     const linha = `${indice + 1}. "${achado.trecho}" — ${achado.motivo} (${CATEGORIAS[achado.categoria]})`
-    return achado.base ? `${linha}\n   ${achado.base}` : linha
+    return { nivel: achado.nivel, texto: achado.base ? `${linha}\n   ${achado.base}` : linha }
   })
+  // Critério vago não é afirmado como descumprimento da lei: fica para quem apura avaliar.
+  const grupo = (titulo, nivel) => {
+    const doNivel = itens.filter((item) => item.nivel === nivel).map((item) => item.texto)
+    return doNivel.length ? [titulo, '', ...doNivel, ''] : []
+  }
   return [
     'Denúncia de anúncio de emprego com possível discriminação',
     '',
-    'O anúncio descrito ao final parece descumprir a legislação nos seguintes trechos:',
-    '',
-    ...itens,
-    '',
+    ...grupo('Trechos que podem descumprir a lei:', 'proibida'),
+    ...grupo('Outros trechos para avaliação:', 'atencao'),
+    ...(texto.trim() ? ['Texto do anúncio:', '', texto.trim(), ''] : []),
     'Peço a apuração. Informações sobre a publicação:',
     'Empresa: [preencher]',
     'Site ou local onde foi publicada: [preencher]',

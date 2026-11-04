@@ -1,6 +1,6 @@
 const CLT = 'CLT, art. 373-A, I: anúncio de emprego não pode citar sexo, idade, cor ou situação familiar, salvo quando a natureza da atividade notoriamente exigir.'
 const LEI_9029 = 'Lei 9.029/1995, art. 1º: proíbe prática discriminatória no acesso ao trabalho por sexo, origem, raça, cor, estado civil, situação familiar, deficiência, reabilitação profissional ou idade, entre outros motivos.'
-const LEI_7716 = 'Lei 7.716/1989 com a ADO 26 do STF: homotransfobia é crime equiparado ao racismo, inclusive nas relações de trabalho.'
+const LEI_7716 = 'Lei 7.716/1989, art. 4º (negar ou obstar emprego), com a ADO 26 do STF: a homotransfobia é enquadrada nos crimes dessa lei.'
 
 // Padrões em minúsculas e sem acento: o texto é comparado nessa mesma forma.
 export const REGRAS = [

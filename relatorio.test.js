@@ -59,3 +59,25 @@ test('denúncia omite a linha de base quando a regra não cita lei', () => {
   const denuncia = montarDenuncia(analisar('Exigimos boa aparência.'))
   assert.doesNotMatch(denuncia, /CLT|Lei /)
 })
+
+test('denúncia traz o texto do anúncio', () => {
+  const texto = 'Procuramos pessoa do sexo feminino.'
+  assert.match(montarDenuncia(analisar(texto), texto), /Texto do anúncio:\r?\n?\s*Procuramos pessoa do sexo feminino\./)
+})
+
+test('denúncia separa risco legal de critério que só merece avaliação', () => {
+  const texto = 'Sexo feminino e boa aparência.'
+  const denuncia = montarDenuncia(analisar(texto), texto)
+  const legal = denuncia.indexOf('Trechos que podem descumprir a lei:')
+  const avaliar = denuncia.indexOf('Outros trechos para avaliação:')
+  assert.ok(legal >= 0 && avaliar > legal)
+  assert.ok(denuncia.indexOf('Sexo feminino') > legal && denuncia.indexOf('Sexo feminino') < avaliar)
+  assert.ok(denuncia.lastIndexOf('boa aparência" ') > avaliar || denuncia.indexOf('"boa aparência"') > avaliar)
+})
+
+test('denúncia só com critério vago não afirma descumprimento da lei', () => {
+  const texto = 'Exigimos boa aparência.'
+  const denuncia = montarDenuncia(analisar(texto), texto)
+  assert.ok(!denuncia.includes('podem descumprir a lei'))
+  assert.ok(denuncia.includes('Outros trechos para avaliação:'))
+})

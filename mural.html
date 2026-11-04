@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mural de denúncias | Vaga Clara</title>
+  <meta name="description" content="Anúncios de emprego denunciados e aprovados pela moderação, sem o nome da empresa e sem dados pessoais.">
+  <meta name="theme-color" content="#ffdf3d">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Besley:wght@400;700&display=swap">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="capa">
+    <h1><a href="./"><span>Vaga Clara</span></a></h1>
+    <nav aria-label="Principal"><a href="./">Procurar e revisar</a></nav>
+  </header>
+
+  <main class="pagina">
+    <h2>Mural de denúncias</h2>
+    <p class="introducao">Anúncios enviados por visitantes e aprovados pela moderação. O nome da empresa não aparece aqui: quem apura é o Ministério Público do Trabalho.</p>
+    <p id="mural-aviso" role="status"></p>
+    <section id="estatisticas" aria-label="Denúncias por tema" hidden>
+      <p id="total"></p>
+      <ul id="categorias" class="contagens"></ul>
+    </section>
+    <ol id="mural" class="mural"></ol>
+  </main>
+
+  <script type="module" src="mural.js"></script>
+</body>
+</html>

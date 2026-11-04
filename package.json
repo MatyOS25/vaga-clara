@@ -5,5 +5,8 @@
   "scripts": {
     "test": "node --test",
     "cobertura": "node --test --experimental-test-coverage"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15"
   }
 }

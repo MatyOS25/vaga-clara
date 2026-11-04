@@ -16,6 +16,7 @@
   <header class="capa">
     <h1><span>Vaga Clara</span></h1>
     <p>Procure vagas, confira se o anúncio discrimina alguém e denuncie o que estiver errado.</p>
+    <nav aria-label="Principal"><a href="mural.html">Mural de denúncias</a></nav>
   </header>
 
   <noscript>
@@ -36,7 +37,13 @@
         <button type="submit">Buscar vagas</button>
       </form>
       <div id="resultados" hidden>
-        <h3>Vagas abertas</h3>
+        <div id="area-encontradas" hidden>
+          <h3>Vagas encontradas</h3>
+          <p id="estado-vagas" role="status"></p>
+          <ol id="vagas-encontradas" class="encontradas"></ol>
+          <p class="nota-fonte">A análise vale só para o trecho mostrado. Revise o anúncio completo antes de concluir.</p>
+        </div>
+        <h3>Procurar em outros sites</h3>
         <p>Abre a busca em cada site.</p>
         <ul id="links-vagas" class="links"></ul>
         <h3>Anúncios para conferir</h3>
@@ -78,13 +85,25 @@ Experiência com atendimento e pacote Office.</textarea>
           <button type="button" id="procurar" class="discreto">Procurar este anúncio no Google</button>
         </div>
         <p class="canais">Envie ao <a href="https://mpt.mp.br">Ministério Público do Trabalho</a> (escolha seu estado na área de denúncia) ou ligue para o Disque 100, de graça.</p>
+
+        <form id="form-denuncia" class="formulario" novalidate hidden>
+          <h3>Enviar para o mural</h3>
+          <p>A moderação lê antes de publicar. O mural mostra o anúncio sem a empresa, sem e-mail e sem telefone. Não informe seus dados.</p>
+          <label>Empresa (opcional) <input name="empresa" maxlength="200"></label>
+          <label>Cidade (opcional) <input name="cidade" maxlength="120"></label>
+          <label>Link do anúncio (opcional) <input name="link" type="url" maxlength="500"></label>
+          <label>Data em que viu (opcional) <input name="dataVista" type="date"></label>
+          <div class="armadilha" aria-hidden="true"><label>Site <input name="site_web" tabindex="-1" autocomplete="off"></label></div>
+          <button type="submit">Enviar para moderação</button>
+          <p id="estado-denuncia" role="status"></p>
+        </form>
       </section>
     </div>
   </main>
 
   <footer class="rodape">
     <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica.</p>
-    <p>O anúncio fica guardado neste navegador, para você continuar depois. "Limpar texto" apaga o que foi guardado. O texto só sai daqui se você usar "Procurar este anúncio no Google", que envia as primeiras palavras ao Google. Os links de busca enviam o cargo e a cidade ao site que você abrir.</p>
+    <p>O anúncio fica guardado neste navegador, para você continuar depois. "Limpar texto" apaga o que foi guardado. Ele só sai daqui se você enviar para moderação ou usar "Procurar este anúncio no Google", que envia as primeiras palavras ao Google. A busca envia o cargo e a cidade à fonte de vagas e ao site que você abrir. Para limitar abusos, o servidor guarda um código derivado do seu IP, nunca o IP.</p>
     <p>Bases citadas: <a href="https://www.planalto.gov.br/ccivil_03/leis/l9799.htm">Lei 9.799/1999, que incluiu o art. 373-A na CLT</a> e <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm">Lei 9.029/1995</a>.</p>
   </footer>
 

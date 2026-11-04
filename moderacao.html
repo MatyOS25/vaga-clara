@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Moderação | Vaga Clara</title>
+  <meta name="theme-color" content="#ffdf3d">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Besley:wght@400;700&display=swap">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="capa">
+    <h1><a href="./"><span>Vaga Clara</span></a></h1>
+    <nav aria-label="Principal"><a href="mural.html">Mural</a> <button type="button" id="sair" class="discreto" hidden>Sair</button></nav>
+  </header>
+
+  <main class="pagina">
+    <h2>Moderação</h2>
+    <p id="aviso" role="status"></p>
+
+    <form id="entrar" class="formulario" hidden>
+      <label>E-mail <input name="email" type="email" autocomplete="username" required></label>
+      <label>Senha <input name="senha" type="password" autocomplete="current-password" required></label>
+      <button type="submit">Entrar</button>
+    </form>
+
+    <ol id="fila" class="mural"></ol>
+  </main>
+
+  <script type="module" src="moderacao.js"></script>
+</body>
+</html>

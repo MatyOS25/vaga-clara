@@ -1,12 +1,15 @@
 import { analisar, segmentar } from './analisar.js'
 import { montarRelatorio, montarDenuncia, resumir, CATEGORIAS, NIVEIS } from './relatorio.js'
 import { linksDeVagas, linksDeAlerta } from './busca.js'
+import { CONFIG } from './config.js'
+import { criarPlataforma } from './plataforma.js'
 
 const campo = document.querySelector('#anuncio')
 const marcas = document.querySelector('#marcas')
 const resumo = document.querySelector('#resumo')
 const lista = document.querySelector('#lista')
 
+const api = criarPlataforma(CONFIG)
 const CHAVE = 'vaga-clara'
 const armazenamento = {
   ler: () => {
@@ -126,6 +129,93 @@ const criarLinks = (links) =>
     return item
   })
 
+const SITE_ADZUNA = 'https://www.adzuna.com.br'
+const areaEncontradas = document.querySelector('#area-encontradas')
+const estadoVagas = document.querySelector('#estado-vagas')
+const listaVagas = document.querySelector('#vagas-encontradas')
+const formDenuncia = document.querySelector('#form-denuncia')
+const estadoDenuncia = document.querySelector('#estado-denuncia')
+
+const revisarVaga = (vaga) => {
+  campo.value = [vaga.titulo, vaga.trecho].filter(Boolean).join('\n\n')
+  atualizar()
+  formDenuncia.elements.empresa.value = vaga.empresa ?? ''
+  formDenuncia.elements.cidade.value = vaga.local ?? ''
+  formDenuncia.elements.link.value = vaga.link ?? ''
+  campo.focus()
+}
+
+const criarVaga = (vaga) => {
+  const item = elemento('li')
+  const revisar = elemento('button', { type: 'button', className: 'discreto', textContent: 'Revisar este trecho' })
+  revisar.addEventListener('click', () => revisarVaga(vaga))
+  const proibidas = vaga.achados.filter((a) => a.nivel === 'proibida').length
+  const alerta = vaga.achados.length
+    ? [elemento('p', {
+        className: proibidas ? 'alerta-vaga proibida' : 'alerta-vaga atencao',
+        textContent: vaga.achados.length === 1 ? '1 trecho para revisar' : `${vaga.achados.length} trechos para revisar`,
+      })]
+    : []
+  const fonte = elemento('a', { href: SITE_ADZUNA, target: '_blank', rel: 'noopener', className: 'selo-fonte', textContent: 'Adzuna' })
+  item.append(
+    vaga.link
+      ? elemento('a', { href: vaga.link, target: '_blank', rel: 'noopener', className: 'titulo-vaga', textContent: vaga.titulo })
+      : elemento('p', { className: 'titulo-vaga', textContent: vaga.titulo }),
+    elemento('p', { className: 'meta-vaga', textContent: [vaga.empresa, vaga.local].filter(Boolean).join(', ') }),
+    ...alerta,
+    elemento('p', { className: 'trecho-vaga', textContent: vaga.trecho }),
+    revisar,
+    fonte,
+  )
+  return item
+}
+
+// Só a última busca desenha: uma resposta atrasada não pode trocar a lista mais nova.
+let buscaAtual = 0
+
+const procurarDentroDoSite = async (pedido) => {
+  buscaAtual += 1
+  const estaBusca = buscaAtual
+  areaEncontradas.hidden = false
+  listaVagas.replaceChildren()
+  estadoVagas.textContent = 'Procurando vagas...'
+  const { dados, erro } = await api.buscarVagas(pedido)
+  if (estaBusca !== buscaAtual) return
+  if (erro) {
+    estadoVagas.textContent = erro
+    return
+  }
+  estadoVagas.textContent = dados.vagas.length === 0
+    ? 'Nenhuma vaga encontrada. Tente outro cargo ou os sites abaixo.'
+    : `${dados.total} vagas. Mostrando as ${dados.vagas.length} primeiras.`
+  listaVagas.replaceChildren(...dados.vagas.map(criarVaga))
+}
+
+formDenuncia.hidden = !api.disponivel
+
+formDenuncia.addEventListener('submit', async (evento) => {
+  evento.preventDefault()
+  const botao = formDenuncia.querySelector('button[type=submit]')
+  botao.disabled = true
+  estadoDenuncia.textContent = 'Enviando...'
+  const campos = formDenuncia.elements
+  const { erro } = await api.enviarDenuncia({
+    texto: campo.value,
+    empresa: campos.empresa.value,
+    cidade: campos.cidade.value,
+    link: campos.link.value,
+    dataVista: campos.dataVista.value,
+    site_web: campos.site_web.value,
+  })
+  botao.disabled = false
+  if (erro) {
+    estadoDenuncia.textContent = erro
+    return
+  }
+  estadoDenuncia.textContent = 'Denúncia recebida. Ela só aparece no mural depois da moderação.'
+  formDenuncia.reset()
+})
+
 const formBusca = document.querySelector('#form-busca')
 const erroBusca = document.querySelector('#erro-busca')
 
@@ -139,7 +229,7 @@ formBusca.addEventListener('submit', (evento) => {
   if (vagas.length === 0) return formBusca.elements.cargo.focus()
   document.querySelector('#links-vagas').replaceChildren(...criarLinks(vagas))
   document.querySelector('#links-alerta').replaceChildren(...criarLinks(linksDeAlerta(pedido)))
-  return undefined
+  return api.disponivel ? procurarDentroDoSite(pedido) : undefined
 })
 
 document.querySelector('#limpar').addEventListener('click', () => {

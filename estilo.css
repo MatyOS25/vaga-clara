@@ -50,7 +50,7 @@ a { color: inherit; }
 /* A ordem das colunas é a ordem do trabalho: procurar, revisar, denunciar. */
 .bancada {
   display: grid;
-  grid-template-columns: 17rem minmax(0, 1fr) 23rem;
+  grid-template-columns: 20rem minmax(0, 1fr) 23rem;
   align-items: start;
   border-bottom: 1px solid var(--tinta);
 }
@@ -172,7 +172,7 @@ textarea {
   resize: none;
 }
 
-mark { color: transparent; }
+#marcas mark { color: transparent; }
 mark.proibida { background: var(--risco); box-shadow: inset 0 -2px var(--risco-texto); }
 mark.atencao { background: var(--marca); }
 
@@ -243,7 +243,7 @@ mark.atencao { background: var(--marca); }
 .sem-js { margin: 0; padding: 1rem 1.5rem; background: var(--marca); font-weight: 700; }
 
 @media (max-width: 72rem) {
-  .bancada { grid-template-columns: 15rem minmax(0, 1fr); }
+  .bancada { grid-template-columns: 18rem minmax(0, 1fr); }
   .coluna-final { grid-column: 1 / -1; border-top: 1px solid var(--tinta); }
   .editor { border-right: 0; position: static; }
   .pauta { height: 26rem; }
@@ -258,3 +258,99 @@ mark.atencao { background: var(--marca); }
   .pauta { height: 19rem; }
   .rodape { padding: 1rem; }
 }
+
+.capa nav { margin-left: auto; }
+
+.capa h1 a { color: inherit; text-decoration: none; }
+
+.encontradas { margin: 0.5rem 0 1rem; padding: 0; list-style: none; }
+
+.encontradas li { padding: 0.75rem 0; border-top: 1px solid var(--linha); }
+
+.titulo-vaga { display: block; margin: 0; font-weight: 700; }
+
+.busca .meta-vaga { margin: 0.125rem 0 0.25rem; font-size: 0.875rem; }
+
+.busca .alerta-vaga {
+  display: inline-block;
+  margin: 0 0 0.25rem;
+  padding: 0 0.25em;
+  color: var(--tinta);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.busca .alerta-vaga.proibida { background: var(--risco); box-shadow: inset 0 -2px var(--risco-texto); }
+.busca .alerta-vaga.atencao { background: var(--marca); }
+
+.busca .trecho-vaga { color: var(--tinta); }
+
+.selo-fonte {
+  display: block;
+  width: fit-content;
+  min-width: 116px;
+  min-height: 23px;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.formulario { display: grid; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--linha); }
+
+.formulario h3 { margin: 0; font-size: 1rem; }
+
+.formulario p { margin: 0; }
+
+.formulario label, .mural label { display: block; font-weight: 700; }
+
+.formulario input, .mural input {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--tinta);
+  border-radius: 2px;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 400 1rem var(--ui);
+}
+
+.formulario button[type='submit'], .acoes-moderacao button:not(.discreto) {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 2px;
+  background: var(--tinta);
+  color: var(--papel);
+  font: 700 1rem var(--ui);
+  cursor: pointer;
+}
+
+.formulario button:disabled { opacity: 0.6; cursor: progress; }
+
+/* Campo-armadilha: pessoas não veem; robôs costumam preencher. */
+.armadilha { position: absolute; left: -9999px; }
+
+.pagina { max-width: 46rem; padding: 2rem 1.5rem 4rem; }
+
+.pagina h2 { margin: 0 0 0.5rem; font: 700 2rem/1.2 var(--anuncio); text-wrap: balance; }
+
+.introducao { max-width: 65ch; margin: 0 0 1.5rem; text-wrap: pretty; }
+
+.contagens { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; margin: 0 0 1.5rem; padding: 0; list-style: none; font-weight: 700; }
+
+.mural { margin: 0; padding: 0; list-style: none; }
+
+.mural > li { display: grid; gap: 0.5rem; padding: 1.25rem 0; border-top: 1px solid var(--tinta); }
+
+.mural p { margin: 0; }
+
+.meta-mural { color: var(--suave); font-size: 0.875rem; }
+
+.anuncio-mural { font: 400 1.0625rem/1.75 var(--anuncio); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.anuncio-mural mark { color: inherit; }
+.anuncio-mural mark.proibida { background: var(--risco); box-shadow: inset 0 -2px var(--risco-texto); }
+.anuncio-mural mark.atencao { background: var(--marca); }
+
+.acoes-moderacao { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; }

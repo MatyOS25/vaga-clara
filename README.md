@@ -11,3 +11,14 @@ Procura vagas nos sites de emprego e revisa anúncios, apontando termos que pode
 - Denunciar: "Copiar texto da denúncia" gera o texto com o anúncio, os trechos e as bases legais para os canais oficiais (MPT, Disque 100). Revise antes de enviar.
 
 As regras são fixas: podem apontar um uso legítimo e deixar passar outro problema. Não substituem orientação jurídica.
+
+## Plataforma
+
+O site continua estático; os dados ficam no Supabase.
+
+- `supabase/migrations/`: tabelas, permissões e funções. Denúncias entram só pelo servidor e viram públicas só depois da moderação. O mural não mostra empresa nem link.
+- `supabase/functions/`: `vagas` consulta a Adzuna sem expor a chave; `denunciar` valida, remove dados pessoais e aplica limite por IP.
+- `servidor/`: a lógica dessas funções, testada sem rede. `servidor/banco.test.js` testa as permissões em um Postgres real (PGlite).
+- `moderacao.html`: fila de revisão, com login.
+
+Para ativar: aplique a migração, publique as funções sem verificação de JWT, defina os segredos `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` e `LIMITE_SAL`, preencha `config.js`, desative novos cadastros no Supabase e cadastre o moderador na tabela `moderadores`.

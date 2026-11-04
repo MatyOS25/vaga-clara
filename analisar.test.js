@@ -144,3 +144,23 @@ test('afirmativa vale com espaço duplo, valor em reais e título em outra linha
   assert.deepEqual(analisar('Vaga afirmativa: salário R$ 1.500, apenas mulheres.'), [])
   assert.deepEqual(analisar('Vaga afirmativa\nExclusiva para mulheres.'), [])
 })
+
+test('orientação sexual ou identidade de gênero como critério é apontada', () => {
+  assert.deepEqual(ids('Não aceitamos pessoas trans.'), ['orientacao'])
+  assert.deepEqual(ids('Somente héteros.'), ['orientacao'])
+  assert.match(analisar('Não aceitamos gays.')[0].base, /7\.716/)
+})
+
+test('exigir nacionalidade é discriminar por origem', () => {
+  assert.deepEqual(ids('Não aceitamos estrangeiros.'), ['origem'])
+  assert.deepEqual(ids('Somente brasileiros natos.'), ['origem'])
+})
+
+test('altura mínima vale revisar', () => {
+  assert.deepEqual(ids('Altura mínima de 1,65m.'), ['aparencia'])
+})
+
+test('"no máximo X anos" é limite de idade, exceto como experiência', () => {
+  assert.deepEqual(ids('No máximo 40 anos.'), ['idade'])
+  assert.deepEqual(analisar('No máximo 10 anos de experiência.'), [])
+})

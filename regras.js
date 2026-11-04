@@ -1,5 +1,6 @@
 const CLT = 'CLT, art. 373-A, I: anúncio de emprego não pode citar sexo, idade, cor ou situação familiar, salvo quando a natureza da atividade notoriamente exigir.'
 const LEI_9029 = 'Lei 9.029/1995, art. 1º: proíbe prática discriminatória no acesso ao trabalho por sexo, origem, raça, cor, estado civil, situação familiar, deficiência, reabilitação profissional ou idade, entre outros motivos.'
+const LEI_7716 = 'Lei 7.716/1989 com a ADO 26 do STF: homotransfobia é crime equiparado ao racismo, inclusive nas relações de trabalho.'
 
 // Padrões em minúsculas e sem acento: o texto é comparado nessa mesma forma.
 export const REGRAS = [
@@ -15,7 +16,7 @@ export const REGRAS = [
     categoria: 'idade',
     nivel: 'proibida',
     // A negação final evita tempo de experiência: "até 10 anos de experiência", "até 15 anos na função".
-    padrao: '(ate|menos de|(idade )?entre [0-9]{2} e) [0-9]{2} anos(?! de| em| na| no)|idade:? (de )?[0-9]{2} a [0-9]{2} anos|idade maxima( de [0-9]{2} anos)?|perfil jovem|pessoa jovem|jovens dinamic[oa]s',
+    padrao: '(ate|menos de|no maximo|(idade )?entre [0-9]{2} e) [0-9]{2} anos(?! de| em| na| no)|idade:? (de )?[0-9]{2} a [0-9]{2} anos|idade maxima( de [0-9]{2} anos)?|perfil jovem|pessoa jovem|jovens dinamic[oa]s',
     motivo: 'Limita a vaga por idade.',
     sugestao: 'Peça a experiência ou o conhecimento que a função exige.',
     base: CLT,
@@ -83,5 +84,29 @@ export const REGRAS = [
     motivo: 'Discrimina pela origem da pessoa.',
     sugestao: 'Se a comunicação for essencial, peça clareza na comunicação.',
     base: LEI_9029,
+  },
+  {
+    categoria: 'origem',
+    nivel: 'proibida',
+    padrao: 'nao aceitamos estrangeir[oa]s?|(apenas|somente|so) brasileir[oa]s?( nat[oa]s?)?',
+    motivo: 'Exclui pessoas pela nacionalidade.',
+    sugestao: 'Peça apenas a autorização de trabalho exigida por lei, se for o caso.',
+    base: LEI_9029,
+  },
+  {
+    categoria: 'orientacao',
+    nivel: 'proibida',
+    padrao: 'nao aceitamos (gays?|homossexuais?|pessoas? trans|transgener[oa]s?|travestis?)|(apenas|somente|so) (pessoas? )?heteros?(sexuais?)?',
+    motivo: 'Usa orientação sexual ou identidade de gênero como critério.',
+    sugestao: 'Retire o critério: ele não mede capacidade para a função.',
+    base: LEI_7716,
+  },
+  {
+    categoria: 'aparencia',
+    nivel: 'atencao',
+    padrao: 'altura minima',
+    motivo: 'Exigir altura costuma excluir mulheres e pessoas de algumas origens sem necessidade.',
+    sugestao: 'Se a função exige alcançar algo, descreva a tarefa em vez da altura.',
+    base: null,
   },
 ]

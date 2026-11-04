@@ -1,5 +1,6 @@
 export const CATEGORIAS = {
   genero: 'Sexo',
+  orientacao: 'Orientação sexual',
   idade: 'Idade',
   familia: 'Família',
   raca: 'Cor ou raça',

@@ -14,7 +14,7 @@
 <body>
   <header class="capa">
     <h1>Vaga Clara</h1>
-    <p>Cole um anúncio de emprego e veja o que pode afastar ou excluir pessoas antes de publicar.</p>
+    <p>Procure vagas, confira se o anúncio discrimina alguém e denuncie o que estiver errado.</p>
   </header>
 
   <noscript>
@@ -22,6 +22,28 @@
   </noscript>
 
   <main class="folha">
+    <section class="busca" aria-labelledby="titulo-busca">
+      <h2 id="titulo-busca">Procurar vagas</h2>
+      <form id="form-busca" novalidate>
+        <label>Cargo ou área
+          <input name="cargo" required aria-describedby="erro-busca">
+        </label>
+        <label>Cidade (opcional)
+          <input name="cidade" autocomplete="address-level2">
+        </label>
+        <button type="submit">Procurar vagas</button>
+      </form>
+      <p id="erro-busca" class="erro-busca" role="alert" hidden>Digite o cargo ou a área que você procura.</p>
+      <div id="resultados" hidden>
+        <h3>Vagas abertas</h3>
+        <p>Cada link abre a busca no próprio site, com o cargo e a cidade que você digitou.</p>
+        <ul id="links-vagas" class="links"></ul>
+        <h3>Anúncios para conferir</h3>
+        <p>Cada link procura no Google, no último mês, termos que costumam indicar discriminação. Aparecer na busca não prova nada: abra o anúncio, cole o texto na revisão abaixo e leia com atenção antes de denunciar.</p>
+        <ul id="links-alerta" class="links"></ul>
+      </div>
+    </section>
+
     <section class="editor" aria-labelledby="rotulo-anuncio">
       <div class="editor-topo">
         <label id="rotulo-anuncio" for="anuncio">Anúncio</label>
@@ -48,17 +70,17 @@ Experiência com atendimento e pacote Office.</textarea>
 
     <section class="denuncia" aria-labelledby="titulo-denuncia">
       <h2 id="titulo-denuncia">Denunciar</h2>
-      <p>Encontrou discriminação? Denuncie ao Ministério Público do Trabalho (MPT) pelo site ou ligue grátis para o Disque 100. O texto da denúncia sai pronto com os trechos e as bases legais; complete com o nome da empresa, o link e a data da publicação.</p>
+      <p>Encontrou discriminação? Denuncie ao Ministério Público do Trabalho (MPT) pelo site ou ligue grátis para o Disque 100. O texto da denúncia sai pronto com o anúncio, os trechos e as bases legais; confira e complete com o nome da empresa, o link e a data da publicação.</p>
       <div class="acoes-denuncia">
         <button type="button" id="copiar-denuncia">Copiar texto da denúncia</button>
-        <button type="button" id="procurar" class="discreto">Procurar o anúncio na internet</button>
+        <button type="button" id="procurar" class="discreto">Procurar este anúncio no Google</button>
       </div>
-      <p class="canais">Canais oficiais: <a href="https://mpt.mp.br">mpt.mp.br</a> (opção "Denuncie") · Disque 100 (ligação gratuita)</p>
+      <p class="canais">Canais oficiais: <a href="https://mpt.mp.br">mpt.mp.br</a> (escolha seu estado na área de denúncia) e Disque 100 (ligação gratuita).</p>
     </section>
   </main>
 
   <footer class="rodape">
-    <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica. O anúncio fica guardado apenas neste navegador, para você continuar a revisão depois, e não é enviado a nenhum servidor. "Limpar texto" apaga o que foi guardado.</p>
+    <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica. O anúncio fica guardado apenas neste navegador, para você continuar a revisão depois. "Limpar texto" apaga o que foi guardado. O texto só sai daqui se você usar "Procurar este anúncio no Google", que envia as primeiras palavras ao Google. Os links de busca enviam o cargo e a cidade ao site que você abrir.</p>
     <p>Bases citadas: <a href="https://www.planalto.gov.br/ccivil_03/leis/l9799.htm">Lei 9.799/1999, que incluiu o art. 373-A na CLT</a> e <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm">Lei 9.029/1995</a>.</p>
   </footer>
 

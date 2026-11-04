@@ -1,5 +1,6 @@
 import { analisar, segmentar } from './analisar.js'
 import { montarRelatorio, montarDenuncia, resumir, CATEGORIAS, NIVEIS } from './relatorio.js'
+import { linksDeVagas, linksDeAlerta } from './busca.js'
 
 const campo = document.querySelector('#anuncio')
 const marcas = document.querySelector('#marcas')
@@ -104,15 +105,41 @@ document.querySelector('#copiar').addEventListener('click', () =>
 )
 
 document.querySelector('#copiar-denuncia').addEventListener('click', () => {
-  const denuncia = montarDenuncia(analisar(campo.value))
-  if (!denuncia) return avisoDenuncia('Nada a denunciar')
+  const denuncia = montarDenuncia(analisar(campo.value), campo.value)
+  if (!denuncia) return avisoDenuncia('Nenhum trecho apontado')
   return copiarTexto(denuncia, avisoDenuncia, 'Denúncia copiada!')
 })
 
+const avisoProcurar = criarAviso(document.querySelector('#procurar'), 'Procurar este anúncio no Google')
+
 document.querySelector('#procurar').addEventListener('click', () => {
   const inicio = campo.value.trim().split(/\s+/).slice(0, 12).join(' ')
-  if (!inicio) return
-  window.open(`https://www.google.com/search?q=${encodeURIComponent(`"${inicio}"`)}`, '_blank', 'noopener')
+  if (!inicio) return avisoProcurar('Cole um anúncio primeiro')
+  return window.open(`https://www.google.com/search?q=${encodeURIComponent(`"${inicio}"`)}`, '_blank', 'noopener')
+})
+
+const criarLinks = (links) =>
+  links.map(({ nome, url }) => {
+    const link = elemento('a', { href: url, target: '_blank', rel: 'noopener', textContent: nome })
+    const item = elemento('li')
+    item.append(link)
+    return item
+  })
+
+const formBusca = document.querySelector('#form-busca')
+const erroBusca = document.querySelector('#erro-busca')
+
+formBusca.addEventListener('submit', (evento) => {
+  evento.preventDefault()
+  const pedido = { cargo: formBusca.elements.cargo.value, cidade: formBusca.elements.cidade.value }
+  const vagas = linksDeVagas(pedido)
+  erroBusca.hidden = vagas.length > 0
+  formBusca.elements.cargo.setAttribute('aria-invalid', String(vagas.length === 0))
+  document.querySelector('#resultados').hidden = vagas.length === 0
+  if (vagas.length === 0) return formBusca.elements.cargo.focus()
+  document.querySelector('#links-vagas').replaceChildren(...criarLinks(vagas))
+  document.querySelector('#links-alerta').replaceChildren(...criarLinks(linksDeAlerta(pedido)))
+  return undefined
 })
 
 document.querySelector('#limpar').addEventListener('click', () => {

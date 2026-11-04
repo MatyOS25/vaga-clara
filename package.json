@@ -1,0 +1,9 @@
+{
+  "name": "vaga-clara",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "cobertura": "node --test --experimental-test-coverage"
+  }
+}

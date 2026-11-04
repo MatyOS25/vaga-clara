@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vaga Clara</title>
+  <meta name="description" content="Revise um anúncio de emprego e encontre termos que podem discriminar por sexo, idade, cor, família, deficiência ou religião.">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Courier+Prime&display=swap">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="capa">
+    <h1>Vaga Clara</h1>
+    <p>Cole um anúncio de emprego e veja o que pode afastar ou excluir pessoas antes de publicar.</p>
+  </header>
+
+  <main class="folha">
+    <section class="editor" aria-labelledby="rotulo-anuncio">
+      <div class="editor-topo">
+        <label id="rotulo-anuncio" for="anuncio">Anúncio</label>
+        <button type="button" id="limpar" class="discreto">Limpar texto</button>
+      </div>
+      <div class="pauta">
+        <div id="marcas" class="camada" aria-hidden="true"></div>
+        <textarea id="anuncio" class="camada" spellcheck="false" aria-describedby="resumo">Empresa contrata recepcionista.
+
+Requisitos: sexo feminino, até 30 anos, solteira, boa aparência e cabelo liso.
+
+Experiência com atendimento e pacote Office.</textarea>
+      </div>
+    </section>
+
+    <section class="notas" aria-labelledby="titulo-notas">
+      <h2 id="titulo-notas">Revisão</h2>
+      <p id="resumo" role="status"></p>
+      <ol id="lista"></ol>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica. O texto fica no seu navegador e não é enviado a nenhum servidor.</p>
+    <p>Bases citadas: <a href="https://www.planalto.gov.br/ccivil_03/leis/l9799.htm">Lei 9.799/1999, que incluiu o art. 373-A na CLT</a> e <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm">Lei 9.029/1995</a>.</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

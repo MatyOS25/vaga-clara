@@ -1,0 +1,87 @@
+const CLT = 'CLT, art. 373-A, I: anúncio de emprego não pode citar sexo, idade, cor ou situação familiar, salvo quando a natureza da atividade notoriamente exigir.'
+const LEI_9029 = 'Lei 9.029/1995, art. 1º: proíbe prática discriminatória no acesso ao trabalho por sexo, origem, raça, cor, estado civil, situação familiar, deficiência, reabilitação profissional ou idade, entre outros motivos.'
+
+// Padrões em minúsculas e sem acento: o texto é comparado nessa mesma forma.
+export const REGRAS = [
+  {
+    categoria: 'genero',
+    nivel: 'proibida',
+    padrao: 'sexo:? (masculino|feminino)|(apenas|somente|so|exclusiv[ao]s?|exclusivamente)( para)? (homens|mulheres)|(vagas?|procura-se|precisa-se|contrata-se)( de| para)? (homens?|mulher(es)?|mocas?|rapaz(es)?)|preferencia (por|para) (homens|mulheres|candidatas)',
+    motivo: 'Restringe a vaga por sexo.',
+    sugestao: 'Descreva as atividades e use "pessoa" ou "profissional".',
+    base: CLT,
+  },
+  {
+    categoria: 'idade',
+    nivel: 'proibida',
+    // A negação final evita tempo de experiência: "até 10 anos de experiência", "até 15 anos na função".
+    padrao: '(ate|menos de|(idade )?entre [0-9]{2} e) [0-9]{2} anos(?! de| em| na| no)|idade:? (de )?[0-9]{2} a [0-9]{2} anos|idade maxima( de [0-9]{2} anos)?|perfil jovem|pessoa jovem|jovens dinamic[oa]s',
+    motivo: 'Limita a vaga por idade.',
+    sugestao: 'Peça a experiência ou o conhecimento que a função exige.',
+    base: CLT,
+  },
+  {
+    categoria: 'idade',
+    nivel: 'atencao',
+    padrao: 'equipe jovem|recem-formad[oa]s?',
+    motivo: 'Pode sinalizar preferência por pessoas mais novas.',
+    sugestao: 'Fale do nível de senioridade e do tipo de ambiente.',
+    base: null,
+  },
+  {
+    categoria: 'familia',
+    nivel: 'proibida',
+    padrao: 'solteir[oa]s?|(?<!vendas? )casad[oa]s?|sem filhos|estado civil|(teste|exame) de gravidez|nao (esteja )?gravida|sem (planos|pretensao) de (engravidar|ter filhos)',
+    motivo: 'Faz exigência sobre estado civil, filhos ou gravidez.',
+    sugestao: 'Retire a exigência e informe a jornada e as viagens previstas.',
+    base: LEI_9029,
+  },
+  {
+    categoria: 'raca',
+    nivel: 'proibida',
+    padrao: 'pele (clara|branca)|(raca|etnia) branca',
+    motivo: 'Restringe a vaga por cor ou raça.',
+    sugestao: 'Retire a exigência: ela não mede capacidade para a função.',
+    base: CLT,
+  },
+  {
+    categoria: 'raca',
+    nivel: 'atencao',
+    padrao: 'cabelos? (liso|lisos|alisado|alisados|comportado|comportados)|tracos finos',
+    motivo: 'Traço físico usado como critério costuma excluir pessoas negras.',
+    sugestao: 'Se houver regra de higiene ou segurança, descreva essa regra.',
+    base: null,
+  },
+  {
+    categoria: 'aparencia',
+    nivel: 'atencao',
+    padrao: 'boa aparencia|aparencia agradavel|boa apresentacao(?! de)|bem apessoad[oa]|sem tatuage(m|ns)',
+    motivo: 'Critério vago de aparência abre espaço para discriminação.',
+    sugestao: 'Informe o código de vestimenta, se houver um.',
+    base: null,
+  },
+  {
+    categoria: 'deficiencia',
+    nivel: 'proibida',
+    padrao: 'nao aceitamos (pcd|pessoas? com deficiencia)|(?<!com ou )sem deficiencia|fisico perfeito',
+    motivo: 'Exclui pessoas com deficiência.',
+    sugestao: 'Descreva as tarefas e deixe claro que há adaptação razoável.',
+    base: LEI_9029,
+  },
+  {
+    categoria: 'religiao',
+    nivel: 'atencao',
+    padrao: '(de preferencia|preferencialmente|apenas|somente) (evangelic[oa]s?|catolic[oa]s?|crista?o?s?)',
+    motivo: 'Usa a religião como critério de seleção.',
+    sugestao: 'Retire o critério, salvo se a função for de natureza religiosa.',
+    base: null,
+  },
+  {
+    categoria: 'origem',
+    nivel: 'proibida',
+    padrao: 'sem sotaque|(nao aceitamos|exceto) nordestin[oa]s?',
+    motivo: 'Discrimina pela origem da pessoa.',
+    sugestao: 'Se a comunicação for essencial, peça clareza na comunicação.',
+    base: LEI_9029,
+  },
+]

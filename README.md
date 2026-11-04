@@ -19,6 +19,9 @@ O site continua estático; os dados ficam no Supabase.
 - `supabase/migrations/`: tabelas, permissões e funções. Denúncias entram só pelo servidor e viram públicas só depois da moderação. O mural não mostra empresa nem link.
 - `supabase/functions/`: `vagas` consulta a Adzuna sem expor a chave; `denunciar` valida, remove dados pessoais e aplica limite por IP.
 - `servidor/`: a lógica dessas funções, testada sem rede. `servidor/banco.test.js` testa as permissões em um Postgres real (PGlite).
-- `moderacao.html`: fila de revisão, com login.
+- `moderacao.html`: fila de revisão, com login. Antes de aprovar, a moderação pode corrigir o texto que será publicado.
+- `vendor/supabase.js`: cópia do cliente oficial (`@supabase/supabase-js`, licença MIT), servida daqui para a página com login não depender de código de terceiros. Para atualizar, troque a versão em `package.json` e copie `dist/umd/supabase.js`.
 
-Para ativar: aplique a migração, publique as funções sem verificação de JWT, defina os segredos `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` e `LIMITE_SAL`, preencha `config.js`, desative novos cadastros no Supabase e cadastre o moderador na tabela `moderadores`.
+Para ativar: aplique a migração, publique as funções sem verificação de JWT, defina os segredos `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` e `LIMITE_SAL`, preencha `config.js`, desative novos cadastros no Supabase, ative MFA e cadastre o moderador na tabela `moderadores`.
+
+Depois de publicar, confira em produção: com um `X-Forwarded-For` forjado, o limite por IP precisa continuar valendo; e `has_function_privilege('anon', 'public.moderar(uuid,text,text,text)', 'execute')` e `has_table_privilege('anon', 'public.denuncias', 'select')` precisam ser falsos.

@@ -4,9 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; base-uri 'none'; form-action 'none'">
   <title>Moderação | Vaga Clara</title>
   <meta name="theme-color" content="#ffdf3d">
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Besley:wght@400;700&display=swap">
@@ -31,6 +32,7 @@
     <ol id="fila" class="mural"></ol>
   </main>
 
+  <script src="vendor/supabase.js"></script>
   <script type="module" src="moderacao.js"></script>
 </body>
 </html>

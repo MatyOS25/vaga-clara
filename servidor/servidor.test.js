@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { anonimizar } from './anonimizar.js'
 import { prepararDenuncia } from './denunciar.js'
 import { buscarVagas } from './vagas.js'
-import { tratar, chaveDeLimite, ipDoCliente } from './http.js'
+import { tratar, chaveDeLimite, ipDoCliente, dentroDosLimites, origensPermitidas } from './http.js'
 
 const AGORA = new Date('2026-11-04T12:00:00Z')
 const ANUNCIO = 'Contratamos recepcionista do sexo feminino com boa aparência para a recepção.'
@@ -188,8 +188,81 @@ test('chave de limite não guarda o IP', async () => {
   assert.equal(chave, await chaveDeLimite('denunciar', '203.0.113.9', 'sal-teste'))
 })
 
-test('IP do cliente vem do primeiro valor encaminhado', () => {
-  const r = new Request('https://x/f', { headers: { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' } })
-  assert.equal(ipDoCliente(r), '203.0.113.9')
+test('IP do cliente ignora o valor que o próprio cliente pode forjar', () => {
+  const plataforma = new Request('https://x/f', { headers: { 'cf-connecting-ip': '198.51.100.7', 'x-forwarded-for': '1.1.1.1, 203.0.113.9' } })
+  assert.equal(ipDoCliente(plataforma), '198.51.100.7')
+  const encaminhado = new Request('https://x/f', { headers: { 'x-forwarded-for': '1.1.1.1, 203.0.113.9' } })
+  assert.equal(ipDoCliente(encaminhado), '203.0.113.9')
   assert.equal(ipDoCliente(new Request('https://x/f')), 'desconhecido')
+})
+
+for (const [nome, texto] of [
+  ['celular sem DDD', 'Ligue 98888-7777 hoje'],
+  ['celular sem separador', 'Ligue 988887777 hoje'],
+  ['telefone com pontos', 'Ligue 11.98888.7777 hoje'],
+  ['dígitos de largura total', 'Ligue １１９８８８８７７７７ hoje'],
+  ['caractere invisível', 'Ligue 11 9\u200b8888-7777 hoje'],
+  ['dígitos espaçados', 'Ligue 1 1 9 8 8 8 8 7 7 7 7 hoje'],
+  ['CPF espaçado', 'CPF: 123 456 789 10 hoje'],
+]) {
+  test(`anonimizar remove número: ${nome}`, () => {
+    assert.doesNotMatch(anonimizar(texto).normalize('NFKC'), /\d/)
+  })
+}
+
+test('anonimizar remove e-mail disfarçado, link e perfil', () => {
+  assert.doesNotMatch(anonimizar('Fale com fulano (at) gmail.com agora'), /fulano|gmail/)
+  assert.doesNotMatch(anonimizar('Fale com fulano arroba gmail agora'), /fulano|gmail/)
+  assert.doesNotMatch(anonimizar('Veja wa.me/5511988887777 agora'), /wa\.me|5511/)
+  assert.doesNotMatch(anonimizar('Veja https://empresa.com/vaga/1 agora'), /empresa\.com/)
+  assert.doesNotMatch(anonimizar('Siga @perfil_da_loja agora'), /perfil_da_loja/)
+})
+
+test('anonimizar mantém intervalo de anos e endereço de e-mail vira aviso', () => {
+  assert.equal(anonimizar('Atuou de 2022-2024 na área'), 'Atuou de 2022-2024 na área')
+  assert.equal(anonimizar('Atuou de 2022 2024 na área'), 'Atuou de 2022 2024 na área')
+})
+
+test('anonimizar tira o nome da empresa do texto, sem diferenciar maiúsculas', () => {
+  assert.equal(anonimizar('A ACME contrata. Vaga na acme.', { empresa: 'Acme' }), 'A [empresa] contrata. Vaga na [empresa].')
+  assert.equal(anonimizar('A (A+B) contrata', { empresa: '(A+B)' }), 'A [empresa] contrata')
+  assert.equal(anonimizar('Texto igual', { empresa: '  ' }), 'Texto igual')
+})
+
+test('denúncia tira a empresa do texto e anonimiza a cidade', () => {
+  const { linha } = prepararDenuncia({ texto: `A ACME procura. ${ANUNCIO}`, empresa: 'ACME', cidade: 'Niterói, ligue 98888-7777' }, AGORA)
+  assert.doesNotMatch(linha.texto_anuncio, /ACME/)
+  assert.equal(linha.empresa, 'ACME')
+  assert.doesNotMatch(linha.cidade, /98888/)
+})
+
+test('texto hostil grande é recusado rápido, antes de qualquer análise', () => {
+  const inicio = performance.now()
+  const { erros } = prepararDenuncia({ texto: 'a-'.repeat(15500) }, AGORA)
+  assert.ok(erros.texto)
+  assert.ok(performance.now() - inicio < 50)
+})
+
+test('anonimizar não degrada com texto hostil dentro do limite', () => {
+  const inicio = performance.now()
+  for (const texto of ['a-'.repeat(5000), 'x.'.repeat(5000), '1'.repeat(10000), '@'.repeat(10000), 'a@'.repeat(5000)]) anonimizar(texto)
+  assert.ok(performance.now() - inicio < 300, `demorou ${performance.now() - inicio} ms`)
+})
+
+test('limites combinam o IP com um teto geral, e param no primeiro que estourar', async () => {
+  const consumidas = []
+  const consumir = (resposta) => async (chave, maximo, janela) => { consumidas.push({ chave, maximo, janela }); return resposta(chave) }
+  const pedidoIp = new Request('https://x/f', { headers: { 'cf-connecting-ip': '198.51.100.7' } })
+  assert.equal(await dentroDosLimites(consumir(() => true), pedidoIp, 'vagas', { porIp: 30, porDia: 200 }, 'sal'), true)
+  assert.deepEqual(consumidas[1], { chave: 'vagas:geral', maximo: 200, janela: 86400 })
+  assert.match(consumidas[0].chave, /^vagas:[0-9a-f]{64}$/)
+  consumidas.length = 0
+  assert.equal(await dentroDosLimites(consumir(() => false), pedidoIp, 'vagas', { porIp: 30, porDia: 200 }, 'sal'), false)
+  assert.equal(consumidas.length, 1)
+})
+
+test('origens de desenvolvimento só valem quando configuradas', () => {
+  assert.deepEqual(origensPermitidas(''), ['https://matyos25.github.io'])
+  assert.deepEqual(origensPermitidas(undefined), ['https://matyos25.github.io'])
+  assert.deepEqual(origensPermitidas('http://127.0.0.1:8730'), ['https://matyos25.github.io', 'http://127.0.0.1:8730'])
 })

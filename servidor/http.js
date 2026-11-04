@@ -37,11 +37,24 @@ export async function tratar(pedido, { origens, executar, registrar = console.er
   }
 }
 
-export const ipDoCliente = (pedido) => pedido.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'desconhecido'
+// O primeiro valor de x-forwarded-for vem do cliente e pode ser forjado; o último foi escrito pela infraestrutura.
+export const ipDoCliente = (pedido) =>
+  pedido.headers.get('cf-connecting-ip')?.trim() ||
+  pedido.headers.get('x-forwarded-for')?.split(',').at(-1).trim() ||
+  'desconhecido'
+
+export const origensPermitidas = (extra) => ['https://matyos25.github.io', ...(extra ? extra.split(',').map((o) => o.trim()) : [])]
 
 // Guarda só um hash com sal: o limite de envios não precisa saber o IP de ninguém.
 export async function chaveDeLimite(acao, ip, sal) {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${sal}:${ip}`))
   const hash = [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join('')
   return `${acao}:${hash}`
+}
+
+// O teto geral protege a cota da fonte de vagas mesmo se alguém conseguir trocar de IP a cada pedido.
+export async function dentroDosLimites(consumir, pedido, acao, { porIp, porDia }, sal) {
+  const chave = await chaveDeLimite(acao, ipDoCliente(pedido), sal)
+  if (!(await consumir(chave, porIp, 3600))) return false
+  return consumir(`${acao}:geral`, porDia, 86400)
 }

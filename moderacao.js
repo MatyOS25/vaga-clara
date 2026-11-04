@@ -19,12 +19,20 @@ const linkSeguro = (link) => {
 const criarItem = (cliente, denuncia, aoModerar) => {
   const item = elemento('li')
   const link = denuncia.link && linkSeguro(denuncia.link)
+  const textoEditavel = elemento('textarea', { value: denuncia.texto_anuncio, rows: 6, maxLength: 10000 })
+  const rotuloTexto = elemento('label', { textContent: 'Texto que será publicado (retire nomes e contatos) ' })
+  rotuloTexto.append(textoEditavel)
   const motivo = elemento('input', { maxLength: 500 })
   const rotulo = elemento('label', { textContent: 'Motivo (opcional) ' })
   rotulo.append(motivo)
 
   const decidir = async (situacao) => {
-    const { error } = await cliente.rpc('moderar', { denuncia: denuncia.id, nova_situacao: situacao, novo_motivo: motivo.value.trim() || null })
+    const { error } = await cliente.rpc('moderar', {
+      denuncia: denuncia.id,
+      nova_situacao: situacao,
+      novo_motivo: motivo.value.trim() || null,
+      texto_publicado: textoEditavel.value.trim(),
+    })
     if (error) {
       aviso.textContent = 'Não foi possível salvar a decisão. Tente de novo.'
       return
@@ -45,7 +53,7 @@ const criarItem = (cliente, denuncia, aoModerar) => {
   item.append(
     elemento('p', { className: 'meta-mural', textContent: detalhes || 'Sem empresa ou cidade informadas' }),
     ...(link ? [elemento('a', { href: link, target: '_blank', rel: 'noopener noreferrer', textContent: 'Abrir o anúncio' })] : []),
-    elemento('p', { className: 'anuncio-mural', textContent: denuncia.texto_anuncio }),
+    rotuloTexto,
     elemento('p', {
       className: 'meta-mural',
       textContent: denuncia.achados.map((a) => `${NIVEIS[a.nivel]}, ${CATEGORIAS[a.categoria] ?? a.categoria}: "${a.trecho}"`).join('; '),
@@ -82,14 +90,11 @@ const iniciar = async () => {
     aviso.textContent = 'A moderação ainda não está disponível.'
     return
   }
-  let createClient
-  try {
-    ;({ createClient } = await import('https://esm.sh/@supabase/supabase-js@2.119.0'))
-  } catch {
-    aviso.textContent = 'Não foi possível carregar a página. Confira sua conexão e recarregue.'
+  if (!window.supabase) {
+    aviso.textContent = 'Não foi possível carregar a página. Recarregue e tente de novo.'
     return
   }
-  const cliente = createClient(CONFIG.supabaseUrl, CONFIG.chavePublica)
+  const cliente = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.chavePublica)
 
   const mostrar = async (sessao) => {
     formulario.hidden = Boolean(sessao)

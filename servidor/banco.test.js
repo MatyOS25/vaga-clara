@@ -131,3 +131,30 @@ test('banco recusa texto vazio ou longo demais mesmo vindo do servidor', async (
   await assert.rejects(como('service_role', null, `insert into public.denuncias (texto_anuncio, achados) values ('', '[]')`), /check/)
   await assert.rejects(como('service_role', null, `insert into public.denuncias (texto_anuncio, achados) values (repeat('a', 10001), '[]')`), /check/)
 })
+
+test('moderar não refaz decisão nem aceita denúncia inexistente', async () => {
+  const id = await criarDenuncia()
+  await como('authenticated', MODERADOR, `select public.moderar($1, 'rejeitada', null)`, [id])
+  await assert.rejects(como('authenticated', MODERADOR, `select public.moderar($1, 'aprovada', null)`, [id]), /não está disponível/)
+  await assert.rejects(como('authenticated', MODERADOR, `select public.moderar($1, 'aprovada', null)`, ['99999999-9999-9999-9999-999999999999']), /não está disponível/)
+})
+
+test('moderador pode retirar do mural o que já aprovou', async () => {
+  const id = await criarDenuncia()
+  await como('authenticated', MODERADOR, `select public.moderar($1, 'aprovada', null)`, [id])
+  await como('authenticated', MODERADOR, `select public.moderar($1, 'rejeitada', 'Pedido de retirada')`, [id])
+  const { rows } = await como('anon', null, 'select id from public.mural_denuncias(100)')
+  assert.ok(!rows.some((r) => r.id === id))
+})
+
+test('moderador corrige o texto antes de publicar', async () => {
+  const id = await criarDenuncia()
+  await como('authenticated', MODERADOR, `select public.moderar($1, 'aprovada', null, 'Vaga para sexo feminino, [empresa]')`, [id])
+  const { rows } = await como('anon', null, 'select texto_anuncio from public.mural_denuncias(100) where id = $1', [id])
+  assert.equal(rows[0].texto_anuncio, 'Vaga para sexo feminino, [empresa]')
+})
+
+test('correção do moderador continua limitada', async () => {
+  const id = await criarDenuncia()
+  await assert.rejects(como('authenticated', MODERADOR, `select public.moderar($1, 'aprovada', null, '')`, [id]), /check/)
+})

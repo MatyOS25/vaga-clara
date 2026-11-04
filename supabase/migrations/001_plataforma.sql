@@ -22,7 +22,6 @@ create table public.moderadores (
   user_id uuid primary key references auth.users (id) on delete cascade
 );
 
--- ponytail: linhas antigas ficam na tabela; apagar por agendamento se ela crescer.
 create table public.limites (
   chave text primary key,
   inicio timestamptz not null,
@@ -48,7 +47,7 @@ create policy denuncias_moderador_le on public.denuncias
   for select to authenticated
   using ((select public.eh_moderador()));
 
-create function public.moderar(denuncia uuid, nova_situacao text, novo_motivo text)
+create function public.moderar(denuncia uuid, nova_situacao text, novo_motivo text, texto_publicado text default null)
 returns void
 language plpgsql security definer set search_path = ''
 as $$
@@ -62,9 +61,14 @@ begin
   update public.denuncias
      set status = nova_situacao,
          motivo = novo_motivo,
+         texto_anuncio = coalesce(texto_publicado, texto_anuncio),
          moderado_por = auth.uid(),
          moderado_em = now()
-   where id = denuncia;
+   where id = denuncia
+     and (status = 'pendente' or (status = 'aprovada' and nova_situacao = 'rejeitada'));
+  if not found then
+    raise exception 'Esta denúncia não está disponível para revisão.';
+  end if;
 end;
 $$;
 
@@ -111,18 +115,22 @@ begin
     set inicio = case when l.inicio < now() - make_interval(secs => janela_segundos) then now() else l.inicio end,
         contagem = case when l.inicio < now() - make_interval(secs => janela_segundos) then 1 else l.contagem + 1 end
   returning contagem into atual;
+  -- De vez em quando apaga contadores antigos, para a tabela não crescer sem limite.
+  if random() < 0.01 then
+    delete from public.limites where inicio < now() - interval '7 days';
+  end if;
   return atual <= maximo;
 end;
 $$;
 
 revoke all on function public.eh_moderador() from public, anon, authenticated;
-revoke all on function public.moderar(uuid, text, text) from public, anon, authenticated;
+revoke all on function public.moderar(uuid, text, text, text) from public, anon, authenticated;
 revoke all on function public.mural_denuncias(integer) from public, anon, authenticated;
 revoke all on function public.estatisticas_denuncias() from public, anon, authenticated;
 revoke all on function public.consumir_limite(text, integer, integer) from public, anon, authenticated;
 
 grant execute on function public.eh_moderador() to authenticated;
-grant execute on function public.moderar(uuid, text, text) to authenticated;
+grant execute on function public.moderar(uuid, text, text, text) to authenticated;
 grant execute on function public.mural_denuncias(integer) to anon, authenticated;
 grant execute on function public.estatisticas_denuncias() to anon, authenticated;
 grant execute on function public.consumir_limite(text, integer, integer) to service_role;

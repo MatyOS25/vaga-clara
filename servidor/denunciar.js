@@ -30,17 +30,19 @@ export function prepararDenuncia(entrada, agora = new Date()) {
   if (dados.site_web) return { robo: true, erros: {}, linha: null }
 
   const bruto = typeof dados.texto === 'string' ? dados.texto.normalize('NFC').trim() : ''
-  const texto = anonimizar(bruto)
+  // O tamanho vem antes da análise: texto enorme não pode custar processamento.
+  if (bruto.length < TEXTO_MINIMO || bruto.length > TEXTO_MAXIMO) {
+    return { erros: { texto: `Cole o anúncio com ${TEXTO_MINIMO} a ${TEXTO_MAXIMO} caracteres.` }, linha: null }
+  }
+  const empresa = textoCurto(dados.empresa, EMPRESA_MAXIMA)
+  const cidade = textoCurto(dados.cidade, CIDADE_MAXIMA)
+  const texto = anonimizar(bruto, { empresa })
   const achados = analisar(texto).map(({ categoria, nivel, trecho }) => ({ categoria, nivel, trecho }))
   const link = textoCurto(dados.link, LINK_MAXIMO + 1)
   const dataVista = textoCurto(dados.dataVista, 10)
 
   const erros = {
-    ...(bruto.length < TEXTO_MINIMO || bruto.length > TEXTO_MAXIMO
-      ? { texto: `Cole o anúncio com ${TEXTO_MINIMO} a ${TEXTO_MAXIMO} caracteres.` }
-      : achados.length === 0
-        ? { texto: 'A revisão não apontou nenhum trecho neste anúncio.' }
-        : {}),
+    ...(achados.length === 0 ? { texto: 'A revisão não apontou nenhum trecho neste anúncio.' } : {}),
     ...(link && !linkValido(link) ? { link: 'Informe o endereço completo, começando com https://.' } : {}),
     ...(dataVista && !dataValida(dataVista, agora) ? { dataVista: 'Informe uma data válida, que não esteja no futuro.' } : {}),
   }
@@ -50,8 +52,8 @@ export function prepararDenuncia(entrada, agora = new Date()) {
     erros,
     linha: {
       texto_anuncio: texto,
-      empresa: textoCurto(dados.empresa, EMPRESA_MAXIMA),
-      cidade: textoCurto(dados.cidade, CIDADE_MAXIMA),
+      empresa,
+      cidade: cidade && anonimizar(cidade),
       link,
       data_vista: dataVista,
       achados,

@@ -1,6 +1,4 @@
-import { chaveDeLimite, ipDoCliente } from './http.js'
-
-export const ORIGENS = ['https://matyos25.github.io', 'http://127.0.0.1:8730']
+import { dentroDosLimites, origensPermitidas } from './http.js'
 
 const obrigatoria = (ambiente, nome) => {
   const valor = ambiente.get(nome)
@@ -20,11 +18,15 @@ const chamarBanco = (ambiente, caminho, corpo, extras = {}) =>
     body: JSON.stringify(corpo),
   })
 
-export async function dentroDoLimite(ambiente, pedido, acao, maximo, janela) {
-  const chave = await chaveDeLimite(acao, ipDoCliente(pedido), obrigatoria(ambiente, 'LIMITE_SAL'))
-  const resposta = await chamarBanco(ambiente, 'rpc/consumir_limite', { chave_pedido: chave, maximo, janela_segundos: janela })
-  if (!resposta.ok) throw new Error(`Limite falhou: ${resposta.status}`)
-  return (await resposta.json()) === true
+export const origens = (ambiente) => origensPermitidas(ambiente.get('ORIGENS_EXTRAS'))
+
+export function respeitaLimites(ambiente, pedido, acao, regras) {
+  const consumir = async (chave, maximo, janela) => {
+    const resposta = await chamarBanco(ambiente, 'rpc/consumir_limite', { chave_pedido: chave, maximo, janela_segundos: janela })
+    if (!resposta.ok) throw new Error(`Limite falhou: ${resposta.status}`)
+    return (await resposta.json()) === true
+  }
+  return dentroDosLimites(consumir, pedido, acao, regras, obrigatoria(ambiente, 'LIMITE_SAL'))
 }
 
 export async function gravarDenuncia(ambiente, linha) {

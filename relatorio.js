@@ -14,6 +14,20 @@ export const NIVEIS = { proibida: 'Risco legal', atencao: 'Vale revisar' }
 
 const CABECALHO = 'Vaga Clara — revisão de anúncio'
 
+const contar = (quantidade, singular, plural) => (quantidade === 1 ? `1 ${singular}` : `${quantidade} ${plural}`)
+
+export function resumir(texto, achados) {
+  if (!texto.trim()) return 'Cole um anúncio para começar a revisão.'
+  if (achados.length === 0) return 'Nenhum termo das regras foi encontrado. Vale fazer uma leitura final mesmo assim.'
+  const proibidas = achados.filter((achado) => achado.nivel === 'proibida').length
+  const atencao = achados.length - proibidas
+  const partes = [
+    ...(proibidas ? [contar(proibidas, 'com risco legal', 'com risco legal')] : []),
+    ...(atencao ? [contar(atencao, 'vale revisar', 'valem revisar')] : []),
+  ]
+  return `${contar(achados.length, 'trecho para revisar', 'trechos para revisar')}: ${partes.join(' e ')}. Selecione um item para localizar o trecho no anúncio.`
+}
+
 export function montarRelatorio(achados) {
   if (achados.length === 0) {
     return `${CABECALHO}\nNenhum termo das regras foi encontrado. Vale fazer uma leitura final mesmo assim.`

@@ -1,5 +1,5 @@
 import { analisar, segmentar } from './analisar.js'
-import { montarRelatorio, CATEGORIAS, NIVEIS } from './relatorio.js'
+import { montarRelatorio, resumir, CATEGORIAS, NIVEIS } from './relatorio.js'
 
 const campo = document.querySelector('#anuncio')
 const marcas = document.querySelector('#marcas')
@@ -31,13 +31,6 @@ const criarNota = (achado, indice) => {
   return item
 }
 
-const textoResumo = (texto, achados) => {
-  if (!texto.trim()) return 'Cole um anúncio para começar a revisão.'
-  if (achados.length === 0) return 'Nenhum termo das regras foi encontrado. Vale fazer uma leitura final mesmo assim.'
-  const total = achados.length === 1 ? '1 trecho para revisar' : `${achados.length} trechos para revisar`
-  return `${total}. Selecione um item para localizar o trecho no anúncio.`
-}
-
 const sincronizarRolagem = () => {
   marcas.scrollTop = campo.scrollTop
   marcas.scrollLeft = campo.scrollLeft
@@ -54,7 +47,7 @@ const atualizar = () => {
   // A quebra final mantém a altura igual à do campo quando o texto termina em linha vazia.
   marcas.replaceChildren(...segmentar(normalizado, achados).map(criarMarca), document.createTextNode('\n'))
   lista.replaceChildren(...achados.map(criarNota))
-  const novoResumo = textoResumo(normalizado, achados)
+  const novoResumo = resumir(normalizado, achados)
   // Só troca quando muda, para o leitor de tela não repetir o aviso a cada tecla.
   if (resumo.textContent !== novoResumo) resumo.textContent = novoResumo
   sincronizarRolagem()

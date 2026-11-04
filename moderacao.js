@@ -31,7 +31,7 @@ const criarItem = (cliente, denuncia, aoModerar) => {
       denuncia: denuncia.id,
       nova_situacao: situacao,
       novo_motivo: motivo.value.trim() || null,
-      texto_publicado: textoEditavel.value.trim(),
+      texto_publicado: situacao === 'aprovada' ? textoEditavel.value.trim() : null,
     })
     if (error) {
       aviso.textContent = 'Não foi possível salvar a decisão. Tente de novo.'
@@ -64,6 +64,39 @@ const criarItem = (cliente, denuncia, aoModerar) => {
   return item
 }
 
+const criarPublicada = (cliente, denuncia, aoRetirar) => {
+  const item = elemento('li')
+  const retirar = elemento('button', { type: 'button', className: 'discreto', textContent: 'Retirar do mural' })
+  retirar.addEventListener('click', async () => {
+    if (!window.confirm('Retirar esta denúncia do mural? Ela não poderá ser publicada de novo.')) return
+    const { error } = await cliente.rpc('moderar', { denuncia: denuncia.id, nova_situacao: 'rejeitada', novo_motivo: 'Retirada do mural', texto_publicado: null })
+    aviso.textContent = error ? 'Não foi possível retirar. Tente de novo.' : 'Denúncia retirada do mural.'
+    if (!error) aoRetirar()
+  })
+  const acoes = elemento('div', { className: 'acoes-moderacao' })
+  acoes.append(retirar)
+  item.append(
+    elemento('p', { className: 'meta-mural', textContent: [denuncia.empresa, denuncia.cidade].filter(Boolean).join(', ') || 'Sem empresa ou cidade informadas' }),
+    elemento('p', { className: 'anuncio-mural', textContent: denuncia.texto_anuncio }),
+    acoes,
+  )
+  return item
+}
+
+const carregarPublicadas = async (cliente) => {
+  const { data, error } = await cliente
+    .from('denuncias')
+    .select('id, empresa, cidade, texto_anuncio')
+    .eq('status', 'aprovada')
+    .order('moderado_em', { ascending: false })
+    .limit(50)
+  const area = document.querySelector('#area-publicadas')
+  area.hidden = Boolean(error) || data.length === 0
+  if (!error) {
+    document.querySelector('#publicadas').replaceChildren(...data.map((d) => criarPublicada(cliente, d, () => carregarFila(cliente))))
+  }
+}
+
 const carregarFila = async (cliente) => {
   const { data: moderador, error: erroPapel } = await cliente.rpc('eh_moderador')
   if (erroPapel || !moderador) {
@@ -83,6 +116,7 @@ const carregarFila = async (cliente) => {
   }
   if (data.length === 0 && !aviso.textContent) aviso.textContent = 'Nenhuma denúncia aguardando revisão.'
   fila.replaceChildren(...data.map((denuncia) => criarItem(cliente, denuncia, () => carregarFila(cliente))))
+  await carregarPublicadas(cliente)
 }
 
 const iniciar = async () => {
@@ -103,6 +137,7 @@ const iniciar = async () => {
       await carregarFila(cliente)
     } else {
       fila.replaceChildren()
+      document.querySelector('#area-publicadas').hidden = true
     }
   }
 

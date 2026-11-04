@@ -4,10 +4,13 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "cobertura": "node --test --experimental-test-coverage"
+    "cobertura": "node --test --experimental-test-coverage",
+    "empacotar": "node scripts/empacotar-funcoes.mjs",
+    "preparar": "node scripts/preparar-site.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.15",
-    "@supabase/supabase-js": "2.119.0"
+    "@supabase/supabase-js": "2.119.0",
+    "esbuild": "0.28.2"
   }
 }

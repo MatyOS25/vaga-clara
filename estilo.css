@@ -353,4 +353,8 @@ mark.atencao { background: var(--marca); }
 .anuncio-mural mark.proibida { background: var(--risco); box-shadow: inset 0 -2px var(--risco-texto); }
 .anuncio-mural mark.atencao { background: var(--marca); }
 
+.titulo-lista { margin: 2rem 0 0.5rem; font: 700 1.25rem/1.3 var(--anuncio); }
+
+.mural textarea { resize: vertical; line-height: 1.5; }
+
 .acoes-moderacao { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; }

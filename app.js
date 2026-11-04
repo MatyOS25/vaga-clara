@@ -170,26 +170,45 @@ const criarVaga = (vaga) => {
   return item
 }
 
+const PAGINA_MAXIMA = 20
+const maisVagas = document.querySelector('#mais-vagas')
+
 // Só a última busca desenha: uma resposta atrasada não pode trocar a lista mais nova.
 let buscaAtual = 0
+let pedidoAtual = null
+let paginaAtual = 1
 
-const procurarDentroDoSite = async (pedido) => {
-  buscaAtual += 1
+const carregarPagina = async () => {
   const estaBusca = buscaAtual
-  areaEncontradas.hidden = false
-  listaVagas.replaceChildren()
+  maisVagas.hidden = true
   estadoVagas.textContent = 'Procurando vagas...'
-  const { dados, erro } = await api.buscarVagas(pedido)
+  const { dados, erro } = await api.buscarVagas({ ...pedidoAtual, pagina: paginaAtual })
   if (estaBusca !== buscaAtual) return
   if (erro) {
     estadoVagas.textContent = erro
     return
   }
-  estadoVagas.textContent = dados.vagas.length === 0
+  listaVagas.append(...dados.vagas.map(criarVaga))
+  const mostradas = listaVagas.children.length
+  estadoVagas.textContent = mostradas === 0
     ? 'Nenhuma vaga encontrada. Tente outro cargo ou os sites abaixo.'
-    : `${dados.total} vagas. Mostrando as ${dados.vagas.length} primeiras.`
-  listaVagas.replaceChildren(...dados.vagas.map(criarVaga))
+    : `Mostrando ${mostradas} de ${dados.total} vagas.`
+  maisVagas.hidden = dados.vagas.length === 0 || mostradas >= dados.total || paginaAtual >= PAGINA_MAXIMA
 }
+
+const procurarDentroDoSite = (pedido) => {
+  buscaAtual += 1
+  pedidoAtual = pedido
+  paginaAtual = 1
+  areaEncontradas.hidden = false
+  listaVagas.replaceChildren()
+  return carregarPagina()
+}
+
+maisVagas.addEventListener('click', () => {
+  paginaAtual += 1
+  carregarPagina()
+})
 
 formDenuncia.hidden = !api.disponivel
 

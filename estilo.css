@@ -70,6 +70,8 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.acoes-editor { display: flex; gap: 1.25rem; }
+
 label[for='anuncio'], .notas h2 {
   margin: 0;
   font-size: 1.25rem;

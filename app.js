@@ -1,16 +1,5 @@
 import { analisar, segmentar } from './analisar.js'
-
-const CATEGORIAS = {
-  genero: 'Sexo',
-  idade: 'Idade',
-  familia: 'Família',
-  raca: 'Cor ou raça',
-  aparencia: 'Aparência',
-  deficiencia: 'Deficiência',
-  religiao: 'Religião',
-  origem: 'Origem',
-}
-const NIVEIS = { proibida: 'Risco legal', atencao: 'Vale revisar' }
+import { montarRelatorio, CATEGORIAS, NIVEIS } from './relatorio.js'
 
 const campo = document.querySelector('#anuncio')
 const marcas = document.querySelector('#marcas')
@@ -73,6 +62,23 @@ const atualizar = () => {
 
 campo.addEventListener('input', atualizar)
 campo.addEventListener('scroll', sincronizarRolagem)
+
+const copiar = document.querySelector('#copiar')
+let avisoCopia
+
+copiar.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(montarRelatorio(analisar(campo.value)))
+    copiar.textContent = 'Relatório copiado!'
+  } catch {
+    copiar.textContent = 'Não foi possível copiar'
+  }
+  clearTimeout(avisoCopia)
+  avisoCopia = setTimeout(() => {
+    copiar.textContent = 'Copiar relatório'
+  }, 2000)
+})
+
 document.querySelector('#limpar').addEventListener('click', () => {
   campo.value = ''
   atualizar()

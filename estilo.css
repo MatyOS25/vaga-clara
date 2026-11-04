@@ -89,12 +89,6 @@ label[for='anuncio'], .notas h2 {
 .pauta {
   position: relative;
   height: 28rem;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0 calc(var(--linha-editor) - 1px),
-    var(--pauta) calc(var(--linha-editor) - 1px) var(--linha-editor)
-  );
-  background-attachment: local;
 }
 
 .camada {
@@ -113,10 +107,17 @@ label[for='anuncio'], .notas h2 {
   scrollbar-gutter: stable;
 }
 
+/* As linhas ficam na camada sincronizada com o campo, para rolarem junto com o texto. */
 #marcas {
   color: transparent;
   pointer-events: none;
   overflow: hidden;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--linha-editor) - 1px),
+    var(--pauta) calc(var(--linha-editor) - 1px) var(--linha-editor)
+  );
+  background-attachment: local;
 }
 
 textarea {

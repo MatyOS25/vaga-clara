@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vaga Clara</title>
-  <meta name="description" content="Revise um anúncio de emprego e encontre termos que podem discriminar por sexo, idade, cor, família, deficiência ou religião.">
+  <meta name="description" content="Procure vagas, revise anúncios de emprego e denuncie termos que discriminam por sexo, idade, cor, família, deficiência ou religião.">
+  <meta name="theme-color" content="#ffdf3d">
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Courier+Prime&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Besley:wght@400;700&display=swap">
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
   <header class="capa">
-    <h1>Vaga Clara</h1>
+    <h1><span>Vaga Clara</span></h1>
     <p>Procure vagas, confira se o anúncio discrimina alguém e denuncie o que estiver errado.</p>
   </header>
 
@@ -21,32 +22,32 @@
     <p class="sem-js">A revisão acontece no seu navegador com JavaScript. Ative o JavaScript e recarregue a página.</p>
   </noscript>
 
-  <main class="folha">
+  <main class="bancada">
     <section class="busca" aria-labelledby="titulo-busca">
-      <h2 id="titulo-busca">Procurar vagas</h2>
+      <h2 id="titulo-busca">Procurar</h2>
       <form id="form-busca" novalidate>
         <label>Cargo ou área
           <input name="cargo" required aria-describedby="erro-busca">
         </label>
+        <p id="erro-busca" class="erro-busca" role="alert" hidden>Digite o cargo ou a área que você procura.</p>
         <label>Cidade (opcional)
           <input name="cidade" autocomplete="address-level2">
         </label>
-        <button type="submit">Procurar vagas</button>
+        <button type="submit">Buscar vagas</button>
       </form>
-      <p id="erro-busca" class="erro-busca" role="alert" hidden>Digite o cargo ou a área que você procura.</p>
       <div id="resultados" hidden>
         <h3>Vagas abertas</h3>
-        <p>Cada link abre a busca no próprio site, com o cargo e a cidade que você digitou.</p>
+        <p>Abre a busca em cada site.</p>
         <ul id="links-vagas" class="links"></ul>
         <h3>Anúncios para conferir</h3>
-        <p>Cada link procura no Google, no último mês, termos que costumam indicar discriminação. Aparecer na busca não prova nada: abra o anúncio, cole o texto na revisão abaixo e leia com atenção antes de denunciar.</p>
+        <p>Busca no Google, no último mês, termos que costumam indicar discriminação. Aparecer aqui não prova nada: cole o anúncio na revisão e leia antes de denunciar.</p>
         <ul id="links-alerta" class="links"></ul>
       </div>
     </section>
 
     <section class="editor" aria-labelledby="rotulo-anuncio">
       <div class="editor-topo">
-        <label id="rotulo-anuncio" for="anuncio">Anúncio</label>
+        <h2><label id="rotulo-anuncio" for="anuncio">Revisar anúncio</label></h2>
         <div class="acoes-editor">
           <button type="button" id="copiar" class="discreto">Copiar relatório</button>
           <button type="button" id="limpar" class="discreto">Limpar texto</button>
@@ -62,25 +63,28 @@ Experiência com atendimento e pacote Office.</textarea>
       </div>
     </section>
 
-    <section class="notas" aria-labelledby="titulo-notas">
-      <h2 id="titulo-notas">Revisão</h2>
-      <p id="resumo" role="status"></p>
-      <ol id="lista"></ol>
-    </section>
+    <div class="coluna-final">
+      <section class="notas" aria-labelledby="titulo-notas">
+        <h2 id="titulo-notas">O que foi apontado</h2>
+        <p id="resumo" role="status"></p>
+        <ol id="lista"></ol>
+      </section>
 
-    <section class="denuncia" aria-labelledby="titulo-denuncia">
-      <h2 id="titulo-denuncia">Denunciar</h2>
-      <p>Encontrou discriminação? Denuncie ao Ministério Público do Trabalho (MPT) pelo site ou ligue grátis para o Disque 100. O texto da denúncia sai pronto com o anúncio, os trechos e as bases legais; confira e complete com o nome da empresa, o link e a data da publicação.</p>
-      <div class="acoes-denuncia">
-        <button type="button" id="copiar-denuncia">Copiar texto da denúncia</button>
-        <button type="button" id="procurar" class="discreto">Procurar este anúncio no Google</button>
-      </div>
-      <p class="canais">Canais oficiais: <a href="https://mpt.mp.br">mpt.mp.br</a> (escolha seu estado na área de denúncia) e Disque 100 (ligação gratuita).</p>
-    </section>
+      <section class="denuncia" aria-labelledby="titulo-denuncia">
+        <h2 id="titulo-denuncia">Denunciar</h2>
+        <p>O texto sai pronto com o anúncio, os trechos e as bases legais. Confira e complete com a empresa, o link e a data.</p>
+        <div class="acoes-denuncia">
+          <button type="button" id="copiar-denuncia">Copiar texto da denúncia</button>
+          <button type="button" id="procurar" class="discreto">Procurar este anúncio no Google</button>
+        </div>
+        <p class="canais">Envie ao <a href="https://mpt.mp.br">Ministério Público do Trabalho</a> (escolha seu estado na área de denúncia) ou ligue para o Disque 100, de graça.</p>
+      </section>
+    </div>
   </main>
 
   <footer class="rodape">
-    <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica. O anúncio fica guardado apenas neste navegador, para você continuar a revisão depois. "Limpar texto" apaga o que foi guardado. O texto só sai daqui se você usar "Procurar este anúncio no Google", que envia as primeiras palavras ao Google. Os links de busca enviam o cargo e a cidade ao site que você abrir.</p>
+    <p>A ferramenta procura expressões por regras fixas: pode apontar um uso legítimo e deixar passar outro problema. Ela não substitui orientação jurídica.</p>
+    <p>O anúncio fica guardado neste navegador, para você continuar depois. "Limpar texto" apaga o que foi guardado. O texto só sai daqui se você usar "Procurar este anúncio no Google", que envia as primeiras palavras ao Google. Os links de busca enviam o cargo e a cidade ao site que você abrir.</p>
     <p>Bases citadas: <a href="https://www.planalto.gov.br/ccivil_03/leis/l9799.htm">Lei 9.799/1999, que incluiu o art. 373-A na CLT</a> e <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm">Lei 9.029/1995</a>.</p>
   </footer>
 

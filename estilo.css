@@ -192,6 +192,14 @@ mark.atencao { background: var(--revisar); box-shadow: inset 0 -2px var(--revisa
 
 .rodape a { color: #fff; }
 
+.sem-js {
+  width: min(72rem, 100% - 2rem);
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--risco-texto);
+  background: var(--papel);
+}
+
 @media (max-width: 52rem) {
   .folha { grid-template-columns: minmax(0, 1fr); }
   .pauta { height: 20rem; }
